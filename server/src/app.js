@@ -10,7 +10,7 @@ const sanitize = require("./middleware/sanitize");
 const errorHandler = require("./middleware/error");
 
 const app = express();
-app.set("trust proxy", 1); // correct client IPs behind nginx / a load balancer (needed for rate limiting)
+app.set('trust proxy', Number(process.env.TRUST_PROXY) || 1);
 app.disable("x-powered-by");
 
 app.use(

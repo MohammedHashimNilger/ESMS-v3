@@ -38,7 +38,7 @@ export default function StudentHome() {
   return (
     <div className="s-wrap">
       <div className="s-top no-print">
-        <div className="brand" style={{ color: 'var(--ink)', padding: 0 }}><i />ExamHall</div>
+        <div className="brand" style={{ color: 'var(--ink)', padding: 0 }}><i />ESMS</div>
         <div className="row">
           {exam && <button className="btn hi sm" onClick={() => window.print()}>Print seat slip</button>}
           <button className="btn ghost sm" onClick={() => setPw({ currentPassword: '', newPassword: '' })}>Change password</button>

@@ -16,7 +16,7 @@ export default function AdminLayout() {
   return (
     <div className="shell">
       <aside className={`side${open ? ' open' : ''}`} onClick={() => setOpen(false)}>
-        <div className="brand"><i />ESMS(Examination and seating management system)</div>
+        <div className="brand"><i />ESMS</div>
         {links.map(([to, label, end]) => <NavLink key={to} to={to} end={end}>{label}</NavLink>)}
         <div className="who">
           <div><b>{user.name}</b></div>

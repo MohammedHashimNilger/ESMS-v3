@@ -8,7 +8,7 @@ export function AuthArt({ title, text }) {
   const seats = Array.from({ length: 60 }, (_, i) => (i === 27 ? 'me' : (Math.floor(i / 6) % 2 === 0 ? 'b' : '')));
   return (
     <div className="auth-art">
-      <div className="brand" style={{ padding: 0 }}><i />ESMS(Examination and seating management system)</div>
+      <div className="brand" style={{ padding: 0 }}><i />ESMS</div>
       <div><h1>{title}</h1><p>{text}</p></div>
       <div className="mini-grid" aria-hidden="true">{seats.map((c, i) => <span key={i} className={c} />)}</div>
     </div>

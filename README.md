@@ -1,4 +1,4 @@
-# ExamHall — University Exam & Seating Management (MERN)
+# ESMS — University Exam & Seating Management (MERN)
 
 Admin panel + student panel. Students sign up against an admin-uploaded master list, admins create rooms/exams and
 auto-allocate seats, students see only their own seat on a highlighted room grid.

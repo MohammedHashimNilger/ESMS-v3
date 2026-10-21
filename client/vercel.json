@@ -1,1 +1,6 @@
-
+   {
+     "rewrites": [
+       { "source": "/api/:path*", "destination": "https://esms-v3-ylzq.onrender.com/api/:path*" },
+       { "source": "/(.*)", "destination": "/index.html" }
+     ]
+   }

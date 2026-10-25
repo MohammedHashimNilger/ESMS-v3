@@ -1,12 +1,5 @@
 import React from 'react';
 
-/**
- * One grid for every use:
- *  - admin seating view   : pass `seats` (from API) + showNames
- *  - student view         : pass `occupied` (numbers only) + `mySeat`
- *  - room editor          : pass `disabled` + onSeatClick to toggle seats
- * Seat numbers run DOWN each column (1..rows in column 1, then column 2 ...).
- */
 export default function RoomGrid({ rows, columns, disabled = [], seats, occupied = [], mySeat, selected, onSeatClick, showNames = false, board = true }) {
   const dis = new Set(disabled);
   const occ = new Set(occupied);

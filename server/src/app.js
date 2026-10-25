@@ -55,7 +55,6 @@ app.use("/api/admins", require("./routes/admins"));
 app.use("/api/settings", require("./routes/settings"));
 app.use("/api", (_req, res) => res.status(404).json({ message: "Not found." }));
 
-// Production: serve the built React app from the same origin (simplest + safest for cookies)
 const dist = path.join(__dirname, "../../client/dist");
 if (fs.existsSync(dist)) {
   app.use(express.static(dist, { maxAge: "7d", index: false }));

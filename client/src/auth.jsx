@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
     return data;
   };
   const logout = async () => {
-    try { await api.post('/auth/logout'); } catch { /* ignore */ }
+    try { await api.post('/auth/logout'); } catch { }
     setState({ loading: false, role: null, user: null });
   };
 

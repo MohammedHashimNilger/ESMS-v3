@@ -10,16 +10,15 @@ const DAY = 24 * 60 * 60 * 1000;
 function issueToken(res, user, role) {
   const token = jwt.sign({ id: user._id, role }, process.env.JWT_SECRET, { expiresIn: '1d' });
   res.cookie(COOKIE, token, {
-    httpOnly: true,                                   // JS can't read it -> XSS can't steal it
-    sameSite: 'lax',                                  // blocks cross-site POSTs (CSRF)
-    secure: process.env.NODE_ENV === 'production',    // HTTPS only in production
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
     maxAge: DAY,
     path: '/',
   });
 }
 const clearToken = (res) => res.clearCookie(COOKIE, { path: '/' });
 
-/** protect('admin') / protect('student') / protect() for any logged-in user. */
 const protect = (...roles) => asyncHandler(async (req, _res, next) => {
   const token = req.cookies && req.cookies[COOKIE];
   if (!token) throw new HttpError(401, 'Please log in.');

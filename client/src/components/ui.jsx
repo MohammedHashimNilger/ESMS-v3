@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
-// ---------- toasts ----------
 const ToastCtx = createContext(() => {});
 export const useToast = () => useContext(ToastCtx);
 
@@ -19,7 +18,6 @@ export function ToastProvider({ children }) {
   );
 }
 
-// ---------- modal ----------
 export function Modal({ title, onClose, width = 640, children }) {
   useEffect(() => {
     const h = (e) => e.key === 'Escape' && onClose();
@@ -66,8 +64,7 @@ export function useDebounced(value, ms = 350) {
   return v;
 }
 
-// ---------- helpers ----------
-export const todayStr = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in the user's timezone
+export const todayStr = () => new Date().toLocaleDateString('en-CA');
 export const SHIFTS = ['Morning', 'Afternoon', 'Evening'];
 export const floorLabel = (f) => (f === 0 ? 'Ground floor' : `${f}${['th', 'st', 'nd', 'rd'][f % 100 > 3 && f % 100 < 21 ? 0 : f % 10 <= 3 ? f % 10 : 0]} floor`);
 export const fmtDate = (s) => new Date(s + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });

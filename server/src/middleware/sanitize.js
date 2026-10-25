@@ -1,4 +1,3 @@
-// Strips Mongo operators ($gt, $ne, ...) and dotted keys from user input (NoSQL-injection defence).
 function clean(v) {
   if (Array.isArray(v)) return v.map(clean);
   if (v && typeof v === 'object') {

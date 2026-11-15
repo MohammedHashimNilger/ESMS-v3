@@ -165,4 +165,9 @@ tr:last-child td { border-bottom: 0; } tbody tr:hover { background: #f8fafd; }
   body.printing-sheets .print-sheets { display: block; }
   .sheet { height: 192mm; break-after: page; page-break-after: always; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .sheet:last-child { break-after: auto; page-break-after: auto; }
+  .no-print { display: none !important; }
+  #full-datesheet-view { max-height: none !important; overflow: visible !important; border: none !important; padding: 0 !important; }
+  .overlay:has(#full-datesheet-view) { position: static !important; background: transparent !important; padding: 0 !important; }
+  .overlay:has(#full-datesheet-view) .modal { width: 100% !important; max-width: 100% !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
+  .overlay:has(#full-datesheet-view) .modal-head { display: none !important; }
 }

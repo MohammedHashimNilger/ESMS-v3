@@ -145,116 +145,87 @@ export default function DatesheetImport({ onClose, onDone }) {
               </details>
             )}
 
-            <div className="row spread wrap" style={{ alignItems: 'center', marginTop: 10, marginBottom: 8, gap: 8 }}>
-              <div className="row wrap" style={{ gap: 6 }}>
-                <button
-                  type="button"
-                  className={`btn sm ${viewTab === 'classes' ? 'hi' : 'ghost'}`}
-                  onClick={() => setViewTab('classes')}
-                >
-                  📅 Grouped by Class ({plan?.classPreview?.length || 0})
-                </button>
-                <button
-                  type="button"
-                  className={`btn sm ${viewTab === 'rows' ? 'hi' : 'ghost'}`}
-                  onClick={() => setViewTab('rows')}
-                >
-                  📝 Raw Spreadsheet Rows ({rows.length})
-                </button>
-              </div>
-
-              {viewTab === 'rows' ? (
-                <div className="row wrap" style={{ gap: 8, alignItems: 'center' }}>
-                  <label className="row" style={{ gap: 6, fontSize: '0.85rem' }}>
-                    <input type="checkbox" checked={onlyBad} onChange={(e) => { setOnlyBad(e.target.checked); setPage(0); }} />
-                    Only problems ({errRows.size} err, {warnRows.size} warn)
-                  </label>
-                  <button className="btn ghost sm" onClick={() => check()} disabled={busy}>
-                    {busy ? 'Checking…' : 'Re-check'}
-                  </button>
-                </div>
-              ) : (
-                <div className="row wrap" style={{ gap: 8, alignItems: 'center' }}>
-                  <span className="muted small">Course · Branch · Year · Semester</span>
-                  <button className="btn ghost sm" onClick={() => check()} disabled={busy}>
-                    {busy ? 'Checking…' : 'Refresh preview'}
-                  </button>
-                </div>
-              )}
+            <div className="row spread wrap">
+              <label className="row" style={{ gap: 6 }}><input type="checkbox" checked={onlyBad} onChange={(e) => { setOnlyBad(e.target.checked); setPage(0); }} /> Show only rows with problems ({errRows.size} errors, {warnRows.size} warnings)</label>
+              <button className="btn ghost sm" onClick={() => check()} disabled={busy}>{busy ? 'Checking…' : 'Re-check'}</button>
             </div>
 
-            {viewTab === 'classes' ? (
-              <ClassSchedulePreview classes={plan?.classPreview || []} maxHeight="46vh" />
-            ) : (
-              <>
-                <div className="table-wrap" style={{ maxHeight: '46vh', overflow: 'auto' }}>
-                  <table>
-                    <thead><tr><th>#</th><th>Course</th><th>Branch</th><th>Year</th><th>Sem</th><th>Code</th><th>Subject</th><th>Date</th><th>Shift</th><th /></tr></thead>
-                    <tbody>
-                      {slice.map(({ r, i }) => {
-                        const errs = errRows.get(r.row); const warns = warnRows.get(r.row);
-                        const cell = (k, w, extra = {}) => <input className="input" style={{ width: w, padding: '4px 6px' }} value={r[k] ?? ''} onChange={(e) => setRow(i, { [k]: e.target.value })} onBlur={() => check()} {...extra} />;
-                        return (
-                          <React.Fragment key={i}>
-                            <tr style={errs ? { background: '#fdeeea' } : warns ? { background: '#fff8e6' } : undefined}>
-                              <td className="muted small">{r.row}</td>
-                              <td>{cell('course', 110)}</td><td>{cell('branch', 110)}</td><td>{cell('year', 52)}</td><td>{cell('semester', 52)}</td><td>{cell('code', 90)}</td>
-                              <td>{cell('subject', 240)}</td>
-                              <td>{cell('date', 108, { placeholder: 'YYYY-MM-DD' })}</td>
-                              <td><select className="input" style={{ padding: '4px 6px' }} value={r.shift} onChange={(e) => { setRow(i, { shift: e.target.value }); }} onBlur={() => check()}>{!SHIFT_OPTS.includes(r.shift) && <option value={r.shift}>{r.shift || '—'}</option>}{SHIFT_OPTS.map((s) => <option key={s}>{s}</option>)}</select></td>
-                              <td><button className="btn danger sm" onClick={() => { delRow(i); setTimeout(() => check(rows.filter((_, j) => j !== i)), 0); }}>✕</button></td>
-                            </tr>
-                            {(errs || warns) && <tr style={errs ? { background: '#fdeeea' } : { background: '#fff8e6' }}><td /><td colSpan={9} className="small" style={{ color: errs ? 'var(--danger)' : 'var(--warn)' }}>{[...(errs || []), ...(warns || [])].join(' · ')}</td></tr>}
-                          </React.Fragment>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="row spread">
-                  <span className="muted small">Rows {shown.length ? page * PAGE + 1 : 0}–{Math.min(shown.length, (page + 1) * PAGE)} of {shown.length}</span>
-                  <div className="row"><button className="btn ghost sm" disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button><button className="btn ghost sm" disabled={page + 1 >= pages} onClick={() => setPage(page + 1)}>Next</button></div>
-                </div>
-              </>
-            )}
+            <div className="table-wrap" style={{ maxHeight: '46vh', overflow: 'auto' }}>
+              <table>
+                <thead><tr><th>#</th><th>Course</th><th>Branch</th><th>Year</th><th>Sem</th><th>Code</th><th>Subject</th><th>Date</th><th>Shift</th><th /></tr></thead>
+                <tbody>
+                  {slice.map(({ r, i }) => {
+                    const errs = errRows.get(r.row); const warns = warnRows.get(r.row);
+                    const cell = (k, w, extra = {}) => <input className="input" style={{ width: w, padding: '4px 6px' }} value={r[k] ?? ''} onChange={(e) => setRow(i, { [k]: e.target.value })} onBlur={() => check()} {...extra} />;
+                    return (
+                      <React.Fragment key={i}>
+                        <tr style={errs ? { background: '#fdeeea' } : warns ? { background: '#fff8e6' } : undefined}>
+                          <td className="muted small">{r.row}</td>
+                          <td>{cell('course', 110)}</td><td>{cell('branch', 110)}</td><td>{cell('year', 52)}</td><td>{cell('semester', 52)}</td><td>{cell('code', 90)}</td>
+                          <td>{cell('subject', 240)}</td>
+                          <td>{cell('date', 108, { placeholder: 'YYYY-MM-DD' })}</td>
+                          <td><select className="input" style={{ padding: '4px 6px' }} value={r.shift} onChange={(e) => { setRow(i, { shift: e.target.value }); }} onBlur={() => check()}>{!SHIFT_OPTS.includes(r.shift) && <option value={r.shift}>{r.shift || '—'}</option>}{SHIFT_OPTS.map((s) => <option key={s}>{s}</option>)}</select></td>
+                          <td><button className="btn danger sm" onClick={() => { delRow(i); setTimeout(() => check(rows.filter((_, j) => j !== i)), 0); }}>✕</button></td>
+                        </tr>
+                        {(errs || warns) && <tr style={errs ? { background: '#fdeeea' } : { background: '#fff8e6' }}><td /><td colSpan={9} className="small" style={{ color: errs ? 'var(--danger)' : 'var(--warn)' }}>{[...(errs || []), ...(warns || [])].join(' · ')}</td></tr>}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="row spread">
+              <span className="muted small">Rows {shown.length ? page * PAGE + 1 : 0}–{Math.min(shown.length, (page + 1) * PAGE)} of {shown.length}</span>
+              <div className="row"><button className="btn ghost sm" disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button><button className="btn ghost sm" disabled={page + 1 >= pages} onClick={() => setPage(page + 1)}>Next</button></div>
+            </div>
 
-            <div className="row" style={{ justifyContent: 'flex-end', marginTop: 10 }}>
+            <div className="row" style={{ justifyContent: 'flex-end' }}>
               <button className="btn ghost" onClick={onClose}>Cancel</button>
-              <button className="btn hi" disabled={busy || !plan || !plan.papers} onClick={save}>
-                {busy ? 'Working…' : `Create ${plan?.exams ?? ''} exams (${plan?.papers ?? ''} papers)${plan?.rowsSkipped ? `, skip ${plan.rowsSkipped} bad rows` : ''}`}
-              </button>
+              <button className="btn" disabled={busy || !plan || !plan.papers} onClick={save}>{busy ? 'Working…' : `Create ${plan?.exams ?? ''} exams (${plan?.papers ?? ''} papers)${plan?.rowsSkipped ? `, skip ${plan.rowsSkipped} bad rows` : ''}`}</button>
             </div>
           </>
         )}
 
         {step === 3 && result && (
           <>
-            <div className="alert ok" style={{ borderLeft: '4px solid #10b981' }}>
-              <b>Exams created successfully!</b> {result.created} exams created, {result.updated} updated, {result.papers} papers scheduled across {(result.classPreview || plan?.classPreview || []).length} classes.
-              {result.allocationsCleared ? ` ${result.allocationsCleared} seat allocations were cleared because those papers changed — re-run allocation.` : ''}
+            <div className="alert ok">
+              <b>Done.</b> {result.created} exams created, {result.updated} updated, {result.papers} papers.{result.allocationsCleared ? ` ${result.allocationsCleared} seat allocations were cleared because those papers changed — re-run allocation.` : ''}
             </div>
 
-            <div className="row spread wrap" style={{ alignItems: 'center', marginTop: 6 }}>
-              <div>
-                <h3 style={{ margin: 0 }}>Created Exam Schedule by Class</h3>
-                <p className="muted small" style={{ margin: '4px 0 0' }}>
-                  Organized by <b>Course · Branch · Year · Semester</b> with all respective subject exams and dates:
-                </p>
-              </div>
-              <span className="badge ok" style={{ fontSize: '0.85rem' }}>
-                {(result.classPreview || plan?.classPreview || []).length} Classes
-              </span>
+            <div className="table-wrap" style={{ maxHeight: '56vh', overflow: 'auto' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Shift</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(result.classPreview || plan?.classPreview || []).map((cls, idx) => (
+                    <React.Fragment key={idx}>
+                      <tr style={{ background: '#f1f5f9' }}>
+                        <td colSpan={4} style={{ padding: '8px 12px' }}>
+                          <b>Course:</b> {cls.course} &nbsp;|&nbsp; <b>Branch:</b> {cls.branch || 'All'} &nbsp;|&nbsp; <b>Year:</b> {cls.year} &nbsp;|&nbsp; <b>Semester:</b> {cls.semester || '—'}
+                        </td>
+                      </tr>
+                      {cls.papers.map((p, pIdx) => (
+                        <tr key={pIdx}>
+                          <td style={{ paddingLeft: 22 }}><b>{p.subject}</b></td>
+                          <td className="nowrap">{p.code || '—'}</td>
+                          <td className="nowrap">{fmtDate(p.date)}</td>
+                          <td><span className="badge">{p.shift}</span></td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <ClassSchedulePreview classes={result.classPreview || plan?.classPreview || []} maxHeight="52vh" />
-
-            <div className="row spread wrap" style={{ marginTop: 14 }}>
-              <a href="/allocations" className="btn hi" style={{ textDecoration: 'none' }}>
-                Proceed to Seating Allocation →
-              </a>
-              <button className="btn ghost" onClick={onClose}>
-                Done / Close
-              </button>
+            <div className="row" style={{ justifyContent: 'flex-end', marginTop: 10 }}>
+              <button className="btn" onClick={onClose}>Close</button>
             </div>
           </>
         )}

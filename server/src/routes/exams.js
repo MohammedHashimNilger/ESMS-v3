@@ -164,6 +164,71 @@ router.get('/datesheet/template', (req, res) => {
   res.send(XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }));
 });
 
+// Export all scheduled exams in official datesheet table format (.xlsx or .csv)
+router.get('/datesheet/export', asyncHandler(async (req, res) => {
+  const exams = await Exam.find().sort({ course: 1, year: 1, semester: 1 }).lean();
+  const rows = [
+    ['S.No.', 'Course', 'Branch', 'Year', 'Semester', 'Subject Code', 'Subject Name', 'Date', 'Shift', 'Duration'],
+  ];
+  const allEntries = [];
+  for (const ex of exams) {
+    for (const en of ex.entries) {
+      allEntries.push({
+        course: ex.course,
+        branch: en.branch || '',
+        year: ex.year,
+        semester: ex.semester || '',
+        code: en.code || '',
+        subject: en.subject,
+        date: en.date,
+        shift: en.shift === 'Morning' ? 'M' : en.shift === 'Afternoon' ? 'A' : en.shift === 'Evening' ? 'E' : (en.shift || 'M'),
+        duration: en.durationMin ? (en.durationMin >= 60 ? `${en.durationMin / 60} Hrs` : `${en.durationMin} Min`) : '3 Hrs',
+      });
+    }
+  }
+
+  allEntries.sort((a, b) =>
+    a.course.localeCompare(b.course) ||
+    a.branch.localeCompare(b.branch) ||
+    a.year - b.year ||
+    (a.semester || 0) - (b.semester || 0) ||
+    a.date.localeCompare(b.date)
+  );
+
+  let sNo = 1;
+  for (const en of allEntries) {
+    const parts = (en.date || '').split('-');
+    const dmy = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : en.date;
+    rows.push([
+      sNo++,
+      en.course,
+      en.branch,
+      en.year,
+      en.semester,
+      en.code,
+      en.subject,
+      dmy,
+      en.shift,
+      en.duration,
+    ]);
+  }
+
+  if (req.query.format === 'csv') {
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="full-datesheet.csv"');
+    const q = (v) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : v);
+    return res.send(rows.map((r) => r.map(q).join(',')).join('\n') + '\n');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [6, 14, 18, 8, 10, 14, 48, 14, 8, 10].map((wch) => ({ wch }));
+  XLSX.utils.book_append_sheet(wb, ws, 'Datesheet');
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename="full-datesheet.xlsx"');
+  res.send(XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }));
+}));
+
 // Step 1: read the file, return editable rows + how course/branch names were matched
 router.post('/datesheet/parse', upload.single('file'), asyncHandler(async (req, res) => {
   if (!req.file) throw new HttpError(400, 'Choose a file to upload.');
